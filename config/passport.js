@@ -48,6 +48,7 @@ passport.use(
       profileFields: ["id", "displayName", "email"],
     },
     async (accToken, refToken, profile, cb) => {
+      console.log(profile);
       let [user, status] = await User.findOrCreate({
         where: {
           user_name: profile.displayName,
