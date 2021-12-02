@@ -67,6 +67,7 @@ passport.use(
       clientID: process.env.GOOGLE_APP_ID,
       clientSecret: process.env.GOOGLE_APP_SECRET,
       callbackURL: process.env.GOOGLE_APP_CALLBACK_URI,
+      proxy: true,
     },
     async (accToken, refToken, profile, cb) => {
       let [user, status] = await User.findOrCreate({
