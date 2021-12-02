@@ -48,15 +48,13 @@ app.use(flash());
 
 db.sequelize.sync({ force: true }).then(() => console.log("Resync db"));
 
-app.get("*", (req, res, next) => {
-  if (
-    req.headers["x-forwarded-proto"] !== "https" &&
-    process.env.NODE_ENV == "production"
-  ) {
-    let uri = "https://" + req.headers.host + req.url;
-    return res.redirect(uri);
-  } else return next();
-});
+if(process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if (req.header('x-forwarded-proto') !== 'https')
+      res.redirect(`https://${req.header.host}${req.url}`)
+    else
+      next()
+  })
 app.get("/", setHomePage);
 app.get("/sign-in", setSignIn);
 app.post("/sign-in", postSignIn);
