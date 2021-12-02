@@ -48,12 +48,12 @@ db.sequelize.sync({ force: true }).then(() => console.log("Resync db"));
 
 app.get("*", (req, res, next) => {
   if (
-    req.headers["x-forwarded-proto"] != "https" &&
+    req.headers["x-forwarded-proto"] !== "https" &&
     process.env.NODE_ENV == "production"
   ) {
     let uri = "https://" + req.headers.host + req.url;
-    res.redirect(uri);
-  } else next();
+    return res.redirect(uri);
+  } else return next();
 });
 app.get("/", setHomePage);
 app.get("/sign-in", setSignIn);
