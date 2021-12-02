@@ -26,6 +26,8 @@ const httpsOpt = {
   cert: fs.readFileSync("./secure/cert.pem"),
 };
 
+app.enable("trust proxy");
+
 app.set("port", port);
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
