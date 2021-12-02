@@ -1,5 +1,4 @@
 const express = require("express");
-const sslRedirect = require("heroku-ssl-redirect").default;
 const https = require("https");
 const fs = require("fs");
 const bodyParser = require("body-parser");
@@ -26,10 +25,6 @@ const httpsOpt = {
   key: fs.readFileSync("./secure/cert.key"),
   cert: fs.readFileSync("./secure/cert.pem"),
 };
-app.use(sslRedirect());
-const server = https.createServer(httpsOpt, app).listen(port, () => {
-  console.log("server running at " + port);
-});
 
 app.set("port", port);
 app.set("views", __dirname + "/views");
@@ -51,6 +46,15 @@ app.use(flash());
 
 db.sequelize.sync({ force: true }).then(() => console.log("Resync db"));
 
+app.get("*", (req, res, next) => {
+  if (
+    req.headers["x-forwarded-proto"] != "https" &&
+    process.env.NODE_ENV == "production"
+  ) {
+    let uri = "https://" + req.headers.host + req.url;
+    res.redirect(uri);
+  } else next();
+});
 app.get("/", setHomePage);
 app.get("/sign-in", setSignIn);
 app.post("/sign-in", postSignIn);
@@ -65,3 +69,7 @@ app.get("/confirmation/:token", confirmation);
 app.get("/resend/:user_id", resend);
 app.get("/reset", setReset);
 app.post("/reset", postReset);
+
+const server = https.createServer(httpsOpt, app).listen(port, () => {
+  console.log("server running at " + port);
+});
