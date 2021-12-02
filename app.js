@@ -1,4 +1,5 @@
 const express = require("express");
+const sslRedirect = require("heroku-ssl-redirect").default;
 const https = require("https");
 const fs = require("fs");
 const bodyParser = require("body-parser");
@@ -17,6 +18,7 @@ const { setSignUp, postSignUp } = require("./routes/sign-up");
 const { setFBSignIn, handleFBSignIn } = require("./routes/facebook");
 const { setGoogleSignIn, handleGoogleSignIn } = require("./routes/google");
 const { setReset, postReset } = require("./routes/reset-password");
+
 const app = express();
 const port = process.env.PORT;
 
@@ -24,6 +26,7 @@ const httpsOpt = {
   key: fs.readFileSync("./secure/cert.key"),
   cert: fs.readFileSync("./secure/cert.pem"),
 };
+app.use(sslRedirect());
 const server = https.createServer(httpsOpt, app).listen(port, () => {
   console.log("server running at " + port);
 });
